@@ -25,5 +25,5 @@ In this example the script uploads 'example.wav', transcribes it using our ru-RU
 
 # How to get user id and token?
 
-To get user id and API token, send an email to info@azreco.az.
-To confirm your email, we will ask you some details about your purpose in using API.
+To get user id and API token, send a request to info@azreco.az.
+To confirm your request, we will ask you some details about your purpose in using API.
