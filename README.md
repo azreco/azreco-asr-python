@@ -1,4 +1,4 @@
-# speech-api-python
+# AzReco Speech Recognition API Python example
 Example python script to help you integrate with our speech recognition API.
 
 This is an example python script for uploading audio(.wav , .mp3 , .opus, .m4a) or video(.mp4 , .mkv) file and saving the transcript into a .json file.
