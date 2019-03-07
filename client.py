@@ -75,7 +75,7 @@ def main():
             out.write(result)
         logging.info("Your transcription has been written to file {}".format(opts.output))
     else:
-        logging.info("Your transcription:")
+        logging.info("Your transcription: {}".format(result))
 
 if __name__ == '__main__':
     main()
