@@ -4,21 +4,21 @@ import logging
 import time
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 import requests
+import re
 
 
 class Transcriber(object):
-    def __init__(self, api_id, api_token, lang, api_url='http://api.azreco.az/transcribe'):
+    def __init__(self, api_id, api_token, lang):
         self.api_id = api_id
         self.api_token = api_token
         self.lang = lang
-        self.api_url = api_url
 
     def transcribe(self, opts):
         """
         Upload a new audio file to azreco for transcription
         If upload suceeds then this method will return the transcription in json format
         """
-
+        self.api_url = 'http://api.azreco.az/transcribe'
         params = {'api_id':int(self.api_id),'api_token': self.api_token, 'lang':self.lang}
         try:
             files={'file':open(opts.audio, "rb")}
@@ -34,6 +34,19 @@ class Transcriber(object):
         else:
             raise Exception("Transcribing failed.")
 
+    def transcribe_video_link(self, opts):
+        """
+        Send video link to azreco for transcription
+        This method will return the transcription in json format
+        """
+        self.api_url = 'http://api.azreco.az/transcribe_video_link'
+        params = {'api_id':int(self.api_id),'api_token': self.api_token, 'lang':self.lang, 'link':opts.audio}
+        request = requests.post(self.api_url, params=params)
+        if request.status_code == 200:
+            return request.text
+        else:
+            raise Exception("Transcribing failed.")
+
 def parse_args():
     """
     Parse command line arguments
@@ -41,11 +54,11 @@ def parse_args():
 
     # Parse the arguments
     parser = ArgumentParser(
-        description='Transcribe audio or video file through the Azreco API',
+        description='Transcribe audio, video files or youtube, facebook, twitter, dailymotion public video links through the Azreco API',
         formatter_class=ArgumentDefaultsHelpFormatter,
     )
-    parser.add_argument('-a', '--audio', type=str, required=True,
-                        help="Audio file to be processed")
+    parser.add_argument('-a', '--audio', type=str, required=False,
+                        help="Audio file or Youtube link to be processed")
     parser.add_argument('-o', '--output', type=str, required=False,
                         help="Output filename (will print to terminal if not specified)", default=None)
     parser.add_argument('-i', '--id', type=str, required=True,
@@ -61,15 +74,22 @@ def parse_args():
 
 def main():
     """
-    Example way to use the Azreco Client to transcribe audio or video file
+    Example way to use the Azreco Client to transcribe audio, video files or youtube, facebook, twitter, dailymotion public video links
     """
     logging.basicConfig(level=logging.INFO)
 
     opts = parse_args()
 
     client = Transcriber(opts.id, opts.token, opts.lang)
-
-    result = client.transcribe(opts)
+    video_link_regex = (r'(https?://)?(www\.)?(youtube|youtu|youtube-nocookie|facebook|dailymotion|twitter)\.(com|be)')
+    result = None
+    if re.match(video_link_regex, opts.audio):
+        result = client.transcribe_video_link(opts)
+    else:
+        result = client.transcribe(opts)
+    if result == None:
+        logging.info("Transcribing failed. Check error messages.")
+        return
     if opts.output:
         with codecs.open(opts.output, 'w', 'utf-8') as out:
             out.write(result)
