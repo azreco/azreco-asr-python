@@ -58,7 +58,7 @@ def parse_args():
         formatter_class=ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument('-a', '--audio', type=str, required=False,
-                        help="Audio file or Youtube link to be processed")
+                        help="Audio file or youtube, facebook, twitter, dailymotion video link to be processed")
     parser.add_argument('-o', '--output', type=str, required=False,
                         help="Output filename (will print to terminal if not specified)", default=None)
     parser.add_argument('-i', '--id', type=str, required=True,
